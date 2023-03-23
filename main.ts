@@ -1,8 +1,30 @@
 namespace SpriteKind {
     export const coin = SpriteKind.create()
 }
+scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sprite, location) {
+    if (info.score() >= 7 && info.life() >= 7) {
+    	
+    }
+})
+function CoinFun (list: Image[]) {
+    randomObstacle = sprites.create(list._pickRandom(), SpriteKind.coin)
+    randomObstacle.setFlag(SpriteFlag.Ghost, true)
+    randomObstacle.setPosition(randint(scene.screenWidth(), 10), 0)
+    randomObstacle.setVelocity(0, 40)
+}
+function EnemyFun (list: Image[]) {
+    randomObstacle = sprites.create(list._pickRandom(), SpriteKind.Projectile)
+    randomObstacle.setFlag(SpriteFlag.Ghost, true)
+    randomObstacle.setPosition(randint(scene.screenWidth(), 10), 0)
+    randomObstacle.setVelocity(0, 40)
+}
+function Foodfun (list: Image[]) {
+    randomFood = sprites.create(list._pickRandom(), SpriteKind.Food)
+    randomFood.setFlag(SpriteFlag.Ghost, true)
+    randomFood.setPosition(randint(scene.screenWidth(), 10), 0)
+    randomFood.setVelocity(0, 40)
+}
 let randomFood: Sprite = null
-let randomCoin: Sprite = null
 let randomObstacle: Sprite = null
 let monkey = sprites.create(img`
     . . . . f f f f f . . . . . . . 
@@ -159,20 +181,11 @@ tiles.setCurrentTilemap(tilemap`level1`)
 tiles.placeOnTile(monkey, tiles.getTileLocation(1, 1))
 tiles.placeOnTile(snake, tiles.getTileLocation(28, 1))
 game.onUpdateInterval(2000, function () {
-    randomObstacle = sprites.create(obstacle._pickRandom(), SpriteKind.Projectile)
-    randomObstacle.setFlag(SpriteFlag.Ghost, true)
-    randomObstacle.setPosition(randint(scene.screenWidth(), 10), 0)
-    randomObstacle.setVelocity(0, 40)
+    EnemyFun(obstacle)
 })
 game.onUpdateInterval(2000, function () {
-    randomCoin = sprites.create(coin_array._pickRandom(), SpriteKind.coin)
-    randomCoin.setFlag(SpriteFlag.Ghost, true)
-    randomCoin.setPosition(randint(scene.screenWidth(), 10), 0)
-    randomCoin.setVelocity(0, 40)
+    Foodfun(life)
 })
 game.onUpdateInterval(2000, function () {
-    randomFood = sprites.create(life._pickRandom(), SpriteKind.Food)
-    randomFood.setFlag(SpriteFlag.Ghost, true)
-    randomFood.setPosition(randint(scene.screenWidth(), 10), 0)
-    randomFood.setVelocity(0, 40)
+    CoinFun(coin_array)
 })
