@@ -189,4 +189,3 @@ game.onUpdateInterval(2000, function () {
 game.onUpdateInterval(2000, function () {
     CoinFun(coin_array)
 })
-
