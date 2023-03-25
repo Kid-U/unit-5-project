@@ -2,7 +2,8 @@
     "name": "Unit 5 Project",
     "description": "",
     "dependencies": {
-        "device": "*"
+        "device": "*",
+        "Use Starry Night": "pub:54370-73299-63130-72785"
     },
     "files": [
         "main.blocks",

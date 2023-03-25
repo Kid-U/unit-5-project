@@ -1,84 +1,135 @@
 namespace SpriteKind {
     export const coin = SpriteKind.create()
 }
-scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sprite, location) {
-    if (info.score() >= 7 && info.life() >= 7) {
-    	
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    while (info.player1.score() + info.player2.score() >= 10) {
+        Foodfun(life)
     }
 })
+scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.chestClosed, function (sprite, location) {
+    if (info.player1.score() >= 5 && info.player1.life() >= 5 && sprite == player1) {
+        game.setGameOverMessage(true, "Player 1 Wins")
+        game.gameOver(true)
+    }
+    if (info.player2.score() >= 5 && info.player2.life() >= 5 && sprite == player2) {
+        game.setGameOverMessage(true, "Player 2 Wins")
+        game.gameOver(true)
+    }
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Projectile, function (sprite, otherSprite) {
+    if (sprite == player2) {
+        info.player2.changeLifeBy(-1)
+    }
+    if (sprite == player1) {
+        info.player1.changeLifeBy(-1)
+    }
+    sprites.destroy(otherSprite)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.coin, function (sprite, otherSprite) {
+    if (sprite == player2) {
+        info.player2.changeScoreBy(1)
+    }
+    if (sprite == player1) {
+        info.player1.changeScoreBy(1)
+    }
+    sprites.destroy(otherSprite)
+})
 function CoinFun (list: Image[]) {
-    randomObstacle = sprites.create(list._pickRandom(), SpriteKind.coin)
-    randomObstacle.setFlag(SpriteFlag.Ghost, true)
-    randomObstacle.setPosition(randint(scene.screenWidth(), 10), 0)
-    randomObstacle.setVelocity(0, 40)
+    randomCoin = sprites.create(list._pickRandom(), SpriteKind.coin)
+    tiles.placeOnRandomTile(randomObstacle, sprites.dungeon.darkGroundNorthWest1)
+    randomCoin.setFlag(SpriteFlag.BounceOnWall, true)
+    randomCoin.setVelocity(30, 10)
+}
+function lifeFun (num: number) {
+    if (num < 4 && !(Num == 0)) {
+        return num
+    }
+    return 1
 }
 function EnemyFun (list: Image[]) {
     randomObstacle = sprites.create(list._pickRandom(), SpriteKind.Projectile)
-    randomObstacle.setFlag(SpriteFlag.Ghost, true)
-    randomObstacle.setPosition(randint(scene.screenWidth(), 10), 0)
-    randomObstacle.setVelocity(0, 40)
+    tiles.placeOnRandomTile(randomObstacle, sprites.dungeon.darkGroundNorthWest1)
+    randomObstacle.setFlag(SpriteFlag.BounceOnWall, true)
+    randomObstacle.setVelocity(30, 10)
 }
 function Foodfun (list: Image[]) {
     randomFood = sprites.create(list._pickRandom(), SpriteKind.Food)
-    randomFood.setFlag(SpriteFlag.Ghost, true)
-    randomFood.setPosition(randint(scene.screenWidth(), 10), 0)
-    randomFood.setVelocity(0, 40)
+    tiles.placeOnRandomTile(randomFood, sprites.dungeon.darkGroundNorthWest1)
+    randomFood.setBounceOnWall(true)
+    randomFood.setVelocity(30, 10)
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Food, function (sprite, otherSprite) {
+    if (sprite == player2) {
+        info.player2.changeLifeBy(1)
+    }
+    if (sprite == player1) {
+        info.player1.changeLifeBy(1)
+    }
+    sprites.destroy(otherSprite)
+})
 let randomFood: Sprite = null
 let randomObstacle: Sprite = null
-let monkey = sprites.create(img`
+let randomCoin: Sprite = null
+let life: Image[] = []
+let player2: Sprite = null
+let player1: Sprite = null
+let Num = 0
+info.player1.setScore(0)
+info.player1.setLife(lifeFun(game.askForNumber("Choose your amount of lives up to 3.", 1)))
+info.player2.setScore(0)
+info.player2.setLife(lifeFun(game.askForNumber("Choose your amount of lives up to 3.", 1)))
+Num = game.askForNumber("Choose a number", 1)
+if (Num == randint(0, 10)) {
+    info.player2.changeLifeBy(1)
+}
+let Num2 = game.askForNumber("Choose a number", 1)
+if (Num2 == randint(0, 10)) {
+    info.player2.changeLifeBy(1)
+}
+player1 = sprites.create(img`
     . . . . f f f f f . . . . . . . 
     . . . f e e e e e f . . . . . . 
-    . . f d d d d e e e f f . . . . 
-    . c d d d d d d e e d d f . . . 
-    . c d f d d f d e e b d c . . . 
-    c d d f d d f d e e b d c . f f 
-    c d e e d d d d e e f c . f e f 
-    c d d d d c d e e e f . . f e f 
-    . f c c c d e e e f f . . f e f 
-    . . f f f f f e e e e f . f e f 
-    . . . . f e e e e e e e f f f . 
-    . . f f e f e e f e e e e f . . 
-    . f e f f e e f f f e e e f . . 
-    f d d b d d c f f f f f f b f . 
-    f d d c d d d f . . f c d d f . 
-    . f f f f f f f . . . f f f . . 
+    . . f d d d d e e e f . . . . . 
+    . c d f d d f d e e f f . . . . 
+    . c d f d d f d e e d d f . . . 
+    c d e e d d d d e e b d c . . . 
+    c d d d d c d d e e b d c . . . 
+    c c c c c d d e e e f c . . . . 
+    . f d d d d e e e f f . . . . . 
+    . . f f f f f e e e e f . . . . 
+    . . . . f f e e e e e e f . f f 
+    . . . f e e f e e f e e f . e f 
+    . . f e e f e e f e e e f . e f 
+    . f b d f d b f b b f e f f e f 
+    . f d d f d d f d d b e f f f f 
+    . . f f f f f f f f f f f f f . 
     `, SpriteKind.Player)
-let obstacle = [img`
-    . . . . . . . . . . . . . . . . 
-    . . . . . . . . . . . . . . . . 
-    . . . . . . . . . . . . . . . . 
-    . . . . . . . . . . . . . . . . 
-    . . . . . . . . . . . . . . . . 
-    . . . . . . . 2 2 . . . . . . . 
-    . . . . . . 3 1 1 3 . . . . . . 
-    . . . . . 2 1 1 1 1 2 . . . . . 
-    . . . . . 2 1 1 1 1 2 . . . . . 
-    . . . . . . 3 1 1 3 . . . . . . 
-    . . . . . . . 2 2 . . . . . . . 
-    . . . . . . . . . . . . . . . . 
-    . . . . . . . . . . . . . . . . 
-    . . . . . . . . . . . . . . . . 
-    . . . . . . . . . . . . . . . . 
-    . . . . . . . . . . . . . . . . 
-    `, img`
-    . . . . . . . . c c c c . . . . 
-    . . . . c c c c c c c c c . . . 
-    . . . c f c c a a a a c a c . . 
-    . . c c f f f f a a a c a a c . 
-    . . c c a f f c a a f f f a a c 
-    . . c c a a a a b c f f f a a c 
-    . c c c c a c c b a f c a a c c 
-    c a f f c c c a b b 6 b b b c c 
-    c a f f f f c c c 6 b b b a a c 
-    c a a c f f c a 6 6 b b b a a c 
-    c c b a a a a b 6 b b a b b a . 
-    . c c b b b b b b b a c c b a . 
-    . . c c c b c c c b a a b c . . 
-    . . . . c b a c c b b b c . . . 
-    . . . . c b b a a 6 b c . . . . 
-    . . . . . . b 6 6 c c . . . . . 
-    `]
+scene.cameraFollowSprite(player1)
+player2 = sprites.create(img`
+    . . . . c c c c c c . . . . . . 
+    . . . c 6 7 7 7 7 6 c . . . . . 
+    . . c 7 7 7 7 7 7 7 7 c . . . . 
+    . c 6 7 7 7 7 7 7 7 7 6 c . . . 
+    . c 7 c 6 6 6 6 c 7 7 7 c . . . 
+    . f 7 6 f 6 6 f 6 7 7 7 f . . . 
+    . f 7 7 7 7 7 7 7 7 7 7 f . . . 
+    . . f 7 7 7 7 6 c 7 7 6 f c . . 
+    . . . f c c c c 7 7 6 f 7 7 c . 
+    . . c 7 2 7 7 7 6 c f 7 7 7 7 c 
+    . c 7 7 2 7 7 c f c 6 7 7 6 c c 
+    c 1 1 1 1 7 6 f c c 6 6 6 c . . 
+    f 1 1 1 1 1 6 6 c 6 6 6 6 f . . 
+    f 6 1 1 1 1 1 6 6 6 6 6 c f . . 
+    . f 6 1 1 1 1 1 1 6 6 6 f . . . 
+    . . c c c c c c c c c f . . . . 
+    `, SpriteKind.Player)
+player1.setStayInScreen(false)
+player2.setStayInScreen(false)
+tiles.setCurrentTilemap(tilemap`level1`)
+tiles.placeOnTile(player1, tiles.getTileLocation(1, 1))
+tiles.placeOnTile(player2, tiles.getTileLocation(28, 1))
+controller.moveSprite(player1)
+controller.moveSprite(player2)
 let coin_array = [img`
     . . b b b b . . 
     . b 5 5 5 5 b . 
@@ -106,7 +157,7 @@ let coin_array = [img`
     . . . . . . . . . . . . . . . . 
     . . . . . . . . . . . . . . . . 
     `]
-let life = [img`
+life = [img`
     .............beebbbb............
     ............eebbbb4bb...........
     ............eb344bb4bb..........
@@ -157,29 +208,41 @@ let life = [img`
     . e e b b 4 4 4 4 4 4 4 4 e e . 
     . . . c c c c c e e e e e . . . 
     `]
-let snake = sprites.create(img`
-    . . . . c c c c c c . . . . . . 
-    . . . c 6 7 7 7 7 6 c . . . . . 
-    . . c 7 7 7 7 7 7 7 7 c . . . . 
-    . c 6 7 7 7 7 7 7 7 7 6 c . . . 
-    . c 7 c 6 6 6 6 c 7 7 7 c . . . 
-    . f 7 6 f 6 6 f 6 7 7 7 f . . . 
-    . f 7 7 7 7 7 7 7 7 7 7 f . . . 
-    . . f 7 7 7 7 6 c 7 7 6 f c . . 
-    . . . f c c c c 7 7 6 f 7 7 c . 
-    . . c 7 2 7 7 7 6 c f 7 7 7 7 c 
-    . c 7 7 2 7 7 c f c 6 7 7 6 c c 
-    c 1 1 1 1 7 6 f c c 6 6 6 c . . 
-    f 1 1 1 1 1 6 6 c 6 6 6 6 f . . 
-    f 6 1 1 1 1 1 6 6 6 6 6 c f . . 
-    . f 6 1 1 1 1 1 1 6 6 6 f . . . 
-    . . c c c c c c c c c f . . . . 
-    `, SpriteKind.Player)
-controller.player1.moveSprite(monkey)
-controller.player2.moveSprite(snake)
-tiles.setCurrentTilemap(tilemap`level1`)
-tiles.placeOnTile(monkey, tiles.getTileLocation(1, 1))
-tiles.placeOnTile(snake, tiles.getTileLocation(28, 1))
+let obstacle = [img`
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . 2 2 . . . . . . . 
+    . . . . . . 3 1 1 3 . . . . . . 
+    . . . . . 2 1 1 1 1 2 . . . . . 
+    . . . . . 2 1 1 1 1 2 . . . . . 
+    . . . . . . 3 1 1 3 . . . . . . 
+    . . . . . . . 2 2 . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    . . . . . . . . . . . . . . . . 
+    `, img`
+    . . . . . . . . c c c c . . . . 
+    . . . . c c c c c c c c c . . . 
+    . . . c f c c a a a a c a c . . 
+    . . c c f f f f a a a c a a c . 
+    . . c c a f f c a a f f f a a c 
+    . . c c a a a a b c f f f a a c 
+    . c c c c a c c b a f c a a c c 
+    c a f f c c c a b b 6 b b b c c 
+    c a f f f f c c c 6 b b b a a c 
+    c a a c f f c a 6 6 b b b a a c 
+    c c b a a a a b 6 b b a b b a . 
+    . c c b b b b b b b a c c b a . 
+    . . c c c b c c c b a a b c . . 
+    . . . . c b a c c b b b c . . . 
+    . . . . c b b a a 6 b c . . . . 
+    . . . . . . b 6 6 c c . . . . . 
+    `]
 game.onUpdateInterval(2000, function () {
     EnemyFun(obstacle)
 })
@@ -188,4 +251,16 @@ game.onUpdateInterval(2000, function () {
 })
 game.onUpdateInterval(2000, function () {
     CoinFun(coin_array)
+})
+game.onUpdateInterval(500, function () {
+    while (info.player1.life() == 0) {
+        game.setGameOverMessage(true, "Player 2 Wins")
+        game.gameOver(true)
+    }
+})
+game.onUpdateInterval(500, function () {
+    while (info.player2.life() == 0) {
+        game.setGameOverMessage(true, "Player 1 Wins")
+        game.gameOver(true)
+    }
 })
